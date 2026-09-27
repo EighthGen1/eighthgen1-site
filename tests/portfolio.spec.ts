@@ -13,6 +13,13 @@ test.describe('EightGen1 portfolio', () => {
   })
 
   test('validates contact form success state', async ({ page }) => {
+    await page.route('https://formsubmit.co/ajax/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: 'true' }),
+      })
+    })
     await page.goto('/')
 
     await page.getByLabel('Name').fill('Jordan Lee')

@@ -9,6 +9,11 @@ type ContactForm = {
   details: string
 }
 
+type FormSubmitResponse = {
+  success?: boolean | string
+  message?: string
+}
+
 const services = [
   {
     title: 'Shopify Development',
@@ -86,6 +91,8 @@ function App() {
   const [selectedBudget, setSelectedBudget] = useState('$15k–40k')
   const [formData, setFormData] = useState<ContactForm>(defaultForm)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionError, setSubmissionError] = useState('')
 
   const budgetOptions = budgetRanges[currency] ?? budgetRanges.USD
 
@@ -94,9 +101,40 @@ function App() {
     setFormData((current) => ({ ...current, [id]: value }))
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setIsSubmitted(true)
+    setIsSubmitting(true)
+    setSubmissionError('')
+
+    try {
+      const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || 'contact@eighthgen1.com'
+      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(contactEmail)}`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          project_details: formData.details,
+          budget: selectedBudget,
+          _subject: 'New EightGen1 project inquiry',
+          _template: 'table',
+        }),
+      })
+      const result = (await response.json()) as FormSubmitResponse
+
+      if (!response.ok || result.success === false || result.success === 'false') {
+        throw new Error(result.message || 'The inquiry could not be sent.')
+      }
+
+      setIsSubmitted(true)
+    } catch {
+      setSubmissionError('We could not send your inquiry. Please try again or email contact@eighthgen1.com.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleCurrencyChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -396,13 +434,14 @@ function App() {
                 />
               </div>
 
-              <button type="submit" className="button button-primary submit-button">
-                Send inquiry
+              <button type="submit" className="button button-primary submit-button" disabled={isSubmitting}>
+                {isSubmitting ? 'Sending…' : 'Send inquiry'}
               </button>
 
               {isSubmitted ? (
-                <p className="form-status mono">Thanks — we&apos;ll be in touch within one business day.</p>
+                <p className="form-status mono" role="status">Thanks — we&apos;ll be in touch within one business day.</p>
               ) : null}
+              {submissionError ? <p className="form-status mono" role="alert">{submissionError}</p> : null}
             </form>
           </div>
         </section>
