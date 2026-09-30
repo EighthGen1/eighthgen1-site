@@ -53,7 +53,7 @@ describe('EightGen1 landing page', () => {
 
     await user.type(screen.getByLabelText(/name/i), 'Ava Taylor')
     await user.type(screen.getByLabelText(/email/i), 'ava@example.com')
-    await user.type(screen.getByLabelText(/project details/i), 'Need a storefront.')
+    await user.type(screen.getByLabelText(/project details/i), 'Need a storefront for a major product launch with online checkout and branded design.')
     await user.click(screen.getByRole('button', { name: /send inquiry/i }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not send your inquiry/i)
