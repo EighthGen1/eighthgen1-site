@@ -1,43 +1,73 @@
-# EightGen1 Portfolio
+# React + TypeScript + Vite
 
-A modern React + TypeScript portfolio for an e-commerce and software engineering studio.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Stack
+Currently, two official plugins are available:
 
-- Vite + React + TypeScript
-- Vitest + Testing Library for unit tests
-- Playwright for E2E validation
-- CSS custom properties for a clean dark design system
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Scripts
+## React Compiler
 
-```bash
-npm install
-npm run dev
-npm run build
-npm run test
-npm run test:e2e
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-## Production setup
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-1. Copy `.env.example` to `.env.local` and fill in the values required by your hosting and email provider.
-2. Add your domain DNS records and set the Vite public URL.
-3. Connect your contact form endpoint or email integration.
-4. Deploy to your preferred static host (Vercel, Netlify, Cloudflare Pages, Vercel + custom domain).
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## Launch checklist
-
-- [ ] Set up a production domain and DNS records
-- [ ] Configure analytics (Google Analytics / GA4)
-- [ ] Connect contact form or email service
-- [ ] Add SEO metadata and social share tags
-- [ ] Set up uptime/monitoring for production
-- [ ] Confirm CSP and deployment environment variables
-
-## Required external accounts
-
-- Email service such as Resend, SendGrid, or Brevo
-- Form endpoint or serverless function for processing inquiries
-- Google Analytics or other site analytics account
-- Domain registrar + DNS host for custom domains
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
